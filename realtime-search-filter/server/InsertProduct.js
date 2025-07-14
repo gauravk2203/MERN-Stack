@@ -27,7 +27,7 @@ const products = [
 
 const insertData = async () => {
   try {
-    await mongoose.connect("mongodb://localhost:27017/realtimeSearch", {
+    await mongoose.connect(process.env.MONGO, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });

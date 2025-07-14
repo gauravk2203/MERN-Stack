@@ -2,18 +2,19 @@ import { Product } from "../Models/ProductModel.js"
 
 export const SearchFilter = async(req, res) => {
     try {
+        // console.log(req)
         const search = req.query.Searchtext;
+        // console.log(search)
 
-        if (search.length === 0) {
+        if (!search || search.length === 0) {
             return res.status(400).json({ Message: "Query is Empty" })
         }
 
         const item = await Product.find({
             $or: [
-                { name: { $regex: searchText, $options: "i" } },
-                { brand: { $regex: searchText, $options: "i" } },
-                { price: { $regex: searchText, $options: "i" } },
-                { category: { $regex: searchText, $options: "i" } },
+                { name: { $regex: search, $options: "i" } },
+                { brand: { $regex: search, $options: "i" } },
+                { category: { $regex: search, $options: "i" } },
             ]
         })
 
