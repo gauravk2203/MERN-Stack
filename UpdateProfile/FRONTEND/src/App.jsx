@@ -1,39 +1,35 @@
-import { useState, useEffect } from 'react';
-import LoginModal from './Components/Login';
-import Profile from './Components/Profile';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import LoginModal from './Pages/Login.jsx';
+import Profile from './Pages/Profile.jsx';
+import Register from './Pages/Register.jsx';
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from './hooks/userAuth.js';
 
 function App() {
-  const [token, setToken] = useState(null);
-  const [showLogin, setShowLogin] = useState(false);
+  const { user, loading } = useAuth();
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      setToken(storedToken);
-    } else {
-      setShowLogin(true);
-    }
-  }, []);
-
-  const handleLoginSuccess = (newToken) => {
-    localStorage.setItem("token", newToken);
-    setToken(newToken);
-    setShowLogin(false);
-  };
- console.log(showLogin)
+  if (loading) return <p>Loading...</p>;
   return (
     <Router>
-      {/* Show modal if not logged in */}
-      {showLogin && <LoginModal onLoginSuccess={handleLoginSuccess} />}
+      <Routes>
+        <Route
+          path="/"
+          element={<Navigate to={user ? "/profile" : "/login"} />}
+        />
 
+        <Route
+          path="/register"
+          element={!user ? <Register /> : <Navigate to="/profile" />}
+        />
+        <Route
+          path="/login"
+          element={!user ? <LoginModal /> : <Navigate to="/profile" />}
+        />
 
-      {/* Routes only if token exists */}
-      {token && (
-        <Routes>
-          <Route path='/' element={<Profile />} />
-        </Routes>
-      )}
+        <Route
+          path="/profile"
+          element={user ? <Profile user={user} /> : <Navigate to="/login" />}
+        />
+      </Routes>
     </Router>
   );
 }

@@ -8,7 +8,7 @@ Router.route('/register').post(registerProfile);
 
 Router.route('/login').post(Login);
 
-Router.route('/update').put(updateProfile);
+Router.route('/update').put( Validation , updateProfile);
 
 Router.route('/User').get( Validation , getUser)
 

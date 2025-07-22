@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from 'bcrypt';
 import User from "../Models/user.model.js";
 
+
 export const registerProfile = async (req, res) => {
   try {
     const formdata = req.body;
@@ -31,8 +32,10 @@ export const registerProfile = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
+    console.log(req)
     const formdata = req.body;
-    const id = req.query.id;
+    const id = req.user.id;
+    console.log(formdata , id)
 
     if (!id) {
       return res.status(400).json({ message: "Id required for update" });
@@ -82,14 +85,30 @@ export const Login = async (req, res) => {
       role: userFound.role,
     };
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: "1h" });
+    const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, {
+      expiresIn: "1h",
+    });
 
-    res.status(200).json({ message: "Login successful", token });
+    // 🔥 FIXED OPTIONS
+    const cookieOptions = {
+      httpOnly: true, // ✅ Typo fixed from 'httpOmly'
+      secure: false, // ✅ Boolean check
+      sameSite: 'Lax',
+      maxAge: 24 * 60 * 60 * 1000, // ✅ 1 day
+    };
+
+    // ✅ Send cookie and response
+    res
+      .status(200)
+      .cookie("token", token, cookieOptions)
+      .json({ message: "Login Successful" });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
   }
 };
+
 
 
 export const getUser = async (req, res) => {
